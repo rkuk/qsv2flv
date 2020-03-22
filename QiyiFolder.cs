@@ -50,6 +50,9 @@ namespace qsv2flv
 
         public static bool IsQiyiFolder(string folderPath)
         {
+            if(!Directory.Exists(folderPath))
+                return false;
+
             QiyiFolder folder = new QiyiFolder(folderPath);
             return File.Exists(folder.QsvFilePath) && File.Exists(folder.ConfigFilePath);
         }

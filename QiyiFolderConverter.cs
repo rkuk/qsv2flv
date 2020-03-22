@@ -23,7 +23,7 @@ namespace qsv2flv
         protected override string getFlvPath(string folderPath)
         {
             QiyiConfig config = this.folder.Config;
-            return Path.Combine(folderPath, config["episode"] + config["subTitle"] + ".flv");
+            return Path.Combine(folderPath, config.Title + ".flv");
         }
     }
 }

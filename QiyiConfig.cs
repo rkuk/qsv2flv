@@ -20,7 +20,17 @@ namespace qsv2flv
             this.configs = null;
         }
 
-        public string this[string configName]
+        public string Series
+        {
+            get { return this["clm"]; }
+        }
+
+        public string Title
+        {
+            get { return this["episode"] + this["subTitle"]; }
+        }
+
+        private string this[string configName]
         {
             get
             {

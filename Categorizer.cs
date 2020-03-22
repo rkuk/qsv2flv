@@ -15,40 +15,37 @@ namespace qsv2flv
             this.rootPath = rootPath;
         }
 
-        public void Categorize(List<string> filePathList)
+        public string Categorize(string filePath)
         {
-            if(this.rootPath==null || filePathList.Count==0)
-                return;//without specifying rootPath, it mean keep the files in its own place
+            //without specifying rootPath, it mean keep the files in its own place
+            if(this.rootPath==null || filePath==null)
+                return filePath;
 
-            if(filePathList.Count==1 && this.rootPath.EndsWith(".flv",StringComparison.CurrentCultureIgnoreCase))
+            //specified the target name of the file
+            if(this.rootPath.EndsWith(".flv",StringComparison.CurrentCultureIgnoreCase))
+                return this.moveFile(filePath, this.rootPath);
+
+            string folder = Path.GetDirectoryName(filePath);
+            string name = Path.GetFileName(filePath);
+            if(QiyiFolder.IsQiyiFolder(folder))
             {
-                //specified the target name of the file
-                this.moveFile(filePathList[0], this.rootPath);
-                return;
+                QiyiFolder qyFolder = new QiyiFolder(folder);
+                QiyiConfig config = qyFolder.Config;
+                name = Path.Combine(config.Series, name);
             }
 
-            foreach(string path in filePathList)
-            {
-                string folder = Path.GetDirectoryName(path);
-                string name = Path.GetFileName(path);
-                if(QiyiFolder.IsQiyiFolder(folder))
-                {
-                    QiyiFolder qyFolder = new QiyiFolder(folder);
-                    QiyiConfig config = qyFolder.Config;
-                    name = Path.Combine(config["clm"], name);
-                }
-
-                this.moveFile(path, Path.Combine(this.rootPath, name));
-            }
+            return this.moveFile(filePath, Path.Combine(this.rootPath, name));
         }
 
-        private void moveFile(string src, string dest)
+        private string moveFile(string src, string dest)
         {
             string dir = Path.GetDirectoryName(dest);
             if(!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
 
-            File.Move(src,this.getUniquePath(dest));
+            dest = this.getUniquePath(dest);
+            File.Move(src, dest);
+            return dest;
         }
 
         private string getUniquePath(string filePath)

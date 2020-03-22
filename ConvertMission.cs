@@ -62,7 +62,7 @@ namespace qsv2flv
 
             foreach(DirectoryInfo subdirInfo in dirInfo.GetDirectories())
             {
-                if(isQsvInFolder(subdirInfo))
+                if(QiyiFolder.IsQiyiFolder(subdirInfo.FullName))
                     return true;
             }
 

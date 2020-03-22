@@ -18,39 +18,35 @@ namespace qsv2flv
 
             print(ConsoleColor.Yellow, "{0} qsv files to convert",mission.ConverterList.Count);
 
-            List<string> flvList = runMission(mission);
+            int successCount = runMission(mission);
 
-            print(ConsoleColor.Yellow, "Converting complete.(Success:{0} Fail:{1})", flvList.Count, mission.ConverterList.Count-flvList.Count);
-
-            if(mission.SavePath!=null && flvList.Count>0)
-            {
-                print("Moving flv files");
-                Categorizer mover = new Categorizer(mission.SavePath);
-                mover.Categorize(flvList);
-                print("Moving complete");
-            }
+            print(ConsoleColor.Yellow, "Complete.(Success:{0} Fail:{1})",successCount, mission.ConverterList.Count-successCount);
         }
 
-        private static List<string> runMission(ConvertMission mission)
+        private static int runMission(ConvertMission mission)
         {
-            List<string> flvList = new List<string>();
-            int index = 1;
+            Categorizer mover = new Categorizer(mission.SavePath);
+            int index = 1, successCount = 0;
             foreach(QsvConverter converter in mission.ConverterList)
             {
                 try
                 {
-                    print("info: convert {0} {1}", index++, converter.InputPath);
+                    print("info: convert({0}) {1}", index++, converter.InputPath);
                     string flvPath = converter.Convert();
-                    flvList.Add(flvPath);
+                    successCount++;
+                    flvPath = mover.Categorize(flvPath);
                     print(ConsoleColor.Green, "      save to {0}", flvPath);
                 }
-                catch (Exception e)
+                catch (ConvertException e)
                 {
-                    print(ConsoleColor.Red, "error: fail to convert {0}", e.Message);
+                    string qsvCopyPath = e.FlvPath + ".qsv";
+                    File.Copy(e.QsvPath, qsvCopyPath);
+                    mover.Categorize(qsvCopyPath);
+                    print(ConsoleColor.Red, "error: ({0}) {1}", e.Message, converter.InputPath);
                 }
             }
 
-            return flvList;
+            return successCount;
         }
 
         private static void print(ConsoleColor color,string format, params object[] args)

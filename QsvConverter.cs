@@ -16,18 +16,16 @@ namespace qsv2flv
 
         public virtual string Convert()
         {
-            Transcoder trans = null;
+            string qsvPath = this.getQsvPath(this.InputPath);
+            string flvPath = this.getFlvPath(this.InputPath);
             try {
-                string qsvPath = this.getQsvPath(this.InputPath);
-                string flvPath = this.getFlvPath(this.InputPath);
-                trans = new Transcoder(qsvPath,flvPath);
-                trans.Transcode();
+                new Transcoder(qsvPath,flvPath).Transcode();
 
                 return flvPath;
             }
-            catch
+            catch(Exception e)
             {
-                throw new Exception(this.InputPath);
+                throw new ConvertException(qsvPath,flvPath,e.Message);
             }
         }
 

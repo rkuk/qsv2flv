@@ -1,35 +1,26 @@
 ﻿using System;
+using System.IO;
 
 namespace qsv2flv
 {
-    /// <summary>
-    /// Description of QsvConverter.
-    /// </summary>
-    public abstract class QsvConverter
-    {
-        public string InputPath;
+	/// <summary>
+	/// Description of QsvConverter.
+	/// </summary>
+	public class QsvConverter
+	{
+		public string QsvPath;
 
-        public QsvConverter(string path)
-        {
-            this.InputPath = path;
-        }
+		public QsvConverter(string qsvPath)
+		{
+			this.QsvPath = qsvPath;
+		}
 
-        public virtual string Convert()
-        {
-            string qsvPath = this.getQsvPath(this.InputPath);
-            string flvPath = this.getFlvPath(this.InputPath);
-            try {
-                new Transcoder(qsvPath,flvPath).Transcode();
+		public virtual string Convert()
+		{
+			string flvPath = Path.ChangeExtension(this.QsvPath, "flv");
+			new Transcoder(this.QsvPath, flvPath).Transcode();
 
-                return flvPath;
-            }
-            catch(Exception e)
-            {
-                throw new ConvertException(qsvPath,flvPath,e.Message);
-            }
-        }
-
-        protected abstract string getQsvPath(string path);
-        protected abstract string getFlvPath(string path);
-    }
+			return flvPath;
+		}
+	}
 }

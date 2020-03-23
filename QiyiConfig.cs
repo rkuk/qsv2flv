@@ -27,7 +27,7 @@ namespace qsv2flv
 
         public string Title
         {
-            get { return this["episode"] + this["subTitle"]; }
+            get { return this["episode"] + " " + this["subTitle"]; }
         }
 
         private string this[string configName]

@@ -10,10 +10,16 @@ namespace qsv2flv
         {
             ConvertMission mission = new ConvertMission(args);
 
-            if(mission.ConverterList.Count == 0)
+            int convertCount = mission.ConverterList.Count;
+            if(convertCount == 0)
             {
                 print("No qsv file found");
                 return;
+            }
+            else if(convertCount>1 && mission.SavePath.EndsWith(".flv",StringComparison.CurrentCultureIgnoreCase))
+            {
+            	print("Can't convert multiple qsf files to a single flv");
+            	return;
             }
 
             print(ConsoleColor.Yellow, "{0} qsv files to convert",mission.ConverterList.Count);
@@ -31,18 +37,16 @@ namespace qsv2flv
             {
                 try
                 {
-                    print("info: convert({0}) {1}", index++, converter.InputPath);
+                    print("info: convert({0}) {1}", index++, converter.QsvPath);
                     string flvPath = converter.Convert();
                     successCount++;
                     flvPath = mover.Categorize(flvPath);
                     print(ConsoleColor.Green, "      save to {0}", flvPath);
                 }
-                catch (ConvertException e)
+                catch (Exception e)
                 {
-                    string qsvCopyPath = e.FlvPath + ".qsv";
-                    File.Copy(e.QsvPath, qsvCopyPath);
-                    mover.Categorize(qsvCopyPath);
-                    print(ConsoleColor.Red, "error: ({0}) {1}", e.Message, converter.InputPath);
+                    mover.Categorize(converter.QsvPath);
+                    print(ConsoleColor.Red, "error: ({0}) {1}", e.Message, converter.QsvPath);
                 }
             }
 
